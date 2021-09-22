@@ -38,11 +38,12 @@ fn main() {
 use std::thread;
 use std::sync::mpsc;
 use std::time::Duration;
-
+//creating Multiple Producers by Cloning the Transmitter
+//through clone
 fn main() {
     let (tx, rx) = mpsc::channel();
 
-
+    let tx1 = tx.clone();
     thread::spawn(move || {
         let vals = vec![
             String::from("fr"),
@@ -52,8 +53,22 @@ fn main() {
         ];
 
         for val in vals {
-            tx.send(val).unwrap();
+            tx1.send(val).unwrap();
             thread::sleep(Duration::from_secs(1));
+        }
+    });
+
+    thread::spawn(move || {
+        let vals = vec![
+            String::from("sa"),
+            String::from("df"),
+            String::from("fg"),
+            String::from("cv"),
+        ];
+
+        for val in vals {
+            tx.send(val).unwrap();
+            thread::sleep(Duration::from_millis(2000));
         }
     });
 
