@@ -35,12 +35,12 @@ fn main() {
     println!("Got {}", received);
 }*/
 
-use std::thread;
+/*use std::thread;
 use std::sync::mpsc;
-use std::time::Duration;
+use std::time::Duration;*/
 //creating Multiple Producers by Cloning the Transmitter
 //through clone
-fn main() {
+/*fn main() {
     let (tx, rx) = mpsc::channel();
 
     let tx1 = tx.clone();
@@ -75,4 +75,59 @@ fn main() {
     for received in rx {
         println!("got {}", received);
     }
+}*/
+
+//mutex: mutual exclusion: a mutex allows only one thread to access some data at any given time
+/*use std::sync::Mutex;
+
+fn main() {
+    let m = Mutex::new(5);
+
+    {
+        let mut num = m.lock().unwrap();
+        *num = 6;
+    }
+
+    println!("m = {:?}", m);
+}*/
+
+//use std::rc::Rc;    //the trait `Send` is not implemented for `Rc<Mutex<i32>>`
+use std::sync::{Mutex, Arc};
+use std::thread;
+
+/*fn main() {
+    let counter = Mutex::new(0);    //new(): association function
+    let mut handles = vec![];
+
+    for _ in 0..10 {
+        let handle = thread::spawn(move || {
+            let mut num = counter.lock().unwrap();
+
+            *num += 1;
+        });
+        handles.push(handle);
+    }
+    for handle in handles {
+        handle.join().unwrap();
+    }
+    println!("Result: {}", *counter.lock().unwrap());
+}*/
+fn main() {
+    let counter = Arc::new(Mutex::new(0));
+    let mut handles = vec![];
+
+    for _ in 0..10 {
+        let counter = Arc::clone(&counter);
+        let handle = thread::spawn(move || {
+            let mut num = counter.lock().unwrap();
+
+            *num += 1;
+        });
+        handles.push(handle);
+    }
+
+    for handle in handles {
+        handle.join().unwrap();
+    }
+    println!("result is {}", *counter.lock().unwrap());
 }
